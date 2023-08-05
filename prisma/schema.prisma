@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int        @id @default(autoincrement())
+  email    String     @unique
+  name     String?
+  created  DateTime   @default(now()) @db.Timestamp(3)
+  image    String?
+  Activity Activity[]
+  Word     Word[]
+}
+
+model Activity {
+  id                    Int      @id @default(autoincrement())
+  user                  User     @relation(fields: [user_email], references: [email])
+  user_email            String
+  total_count_of_visits Int
+  week_count_of_visits  Int
+  consecutive_visits    Int
+  last_visit            DateTime @default(now()) @db.Timestamp(3)
+  dates_of_visits       String[]
+}
+
+model Word {
+  id            Int     @id @default(autoincrement())
+  user_email    User    @relation(fields: [user], references: [email])
+  user          String
+  title         String
+  translate     String
+  transcription String?
+}
