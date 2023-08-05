@@ -12,7 +12,8 @@ export class UserController {
     try {
       return this.userService.createUser(userData);
     } catch (e) {
-      throw new BadGatewayException();
+      // throw new BadGatewayException();
+      console.log(e);
     }
   }
 
