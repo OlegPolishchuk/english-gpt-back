@@ -17,10 +17,14 @@ export class UserController {
     }
   }
 
-  @Get('/')
+  @Get('/:email')
   async getUserData(@Param() email: Email) {
+    console.log({ email });
+    console.log(typeof email);
     try {
-      return this.userService.getUserData(email);
+      const user = await this.userService.getUserData(email);
+      console.log(user);
+      return user;
     } catch (e) {
       throw new BadGatewayException(e);
     }

@@ -1,4 +1,5 @@
 import { IsEmail, IsISO8601, IsNotEmpty, IsString } from 'class-validator';
+import { Optional } from '@nestjs/common';
 
 export class UserDto {
   @IsEmail()
@@ -11,6 +12,7 @@ export class UserDto {
   @IsString()
   image: ImgSrs;
 
+  @Optional()
   @IsISO8601()
-  created: Date;
+  created?: Date;
 }

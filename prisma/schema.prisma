@@ -15,6 +15,7 @@ model User {
   image    String?
   Activity Activity[]
   Word     Word[]
+  Token    Token[]
 }
 
 model Activity {
@@ -30,9 +31,18 @@ model Activity {
 
 model Word {
   id            Int     @id @default(autoincrement())
-  user_email    User    @relation(fields: [user], references: [email])
-  user          String
+  user_email    String
+  user          User    @relation(fields: [user_email], references: [email])
   title         String
   translate     String
   transcription String?
+}
+
+model Token {
+  id         Int      @id @default(autoincrement())
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+  user       User     @relation(fields: [user_email], references: [email])
+  user_email String
 }

@@ -11,7 +11,6 @@ export interface GetUserDataResponse extends User {
 export class UserService {
   constructor(private prisma: PrismaService, private activityService: ActivityService) {}
 
-  // Create New User
   async createUser(user: Prisma.UserCreateInput): Promise<User> {
     const userData = await this.prisma.user.create({ data: user });
     await this.activityService.createActivity(userData.email);
@@ -19,13 +18,15 @@ export class UserService {
     return userData;
   }
 
-  // Get User By Email
   async getUserByEmail(email: Email): Promise<Nullable<User>> {
     return this.prisma.user.findFirst({ where: { email } });
   }
 
-  // Get User Data with Activity
   async getUserData(email: Email): Promise<Nullable<GetUserDataResponse>> {
+    if (!email) return null;
+
+    console.log(`email in service`, email);
+
     return this.prisma.user.findFirst({
       where: { email },
       include: {
