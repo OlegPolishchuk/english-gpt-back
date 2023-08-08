@@ -4,6 +4,7 @@ import { UserDto } from 'entities/user/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'entities/user/user.service';
 import { Prisma } from '@prisma/client';
+import { JWT } from 'constants/jwt';
 
 @Injectable()
 export class AuthService {
@@ -34,9 +35,13 @@ export class AuthService {
   async createNewTokens(userEmail: Email) {
     const data = { email: userEmail };
 
-    const accessToken = this.jwt.sign(data, { expiresIn: '60s' });
-    const refreshToken = this.jwt.sign(data, { expiresIn: '7d' });
+    const accessToken = this.jwt.sign(data, { expiresIn: JWT.accessExpTime });
+    const refreshToken = this.jwt.sign(data, { expiresIn: JWT.refreshExpTime });
 
     return { accessToken, refreshToken };
+  }
+
+  async getUserDataFromTokenEmail(email: Email) {
+    return await this.userService.getUserByEmail(email);
   }
 }

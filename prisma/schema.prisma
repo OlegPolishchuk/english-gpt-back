@@ -39,10 +39,11 @@ model Word {
 }
 
 model Token {
-  id         Int      @id @default(autoincrement())
-  token      String   @unique
-  expires_at DateTime
-  created_at DateTime @default(now())
-  user       User     @relation(fields: [user_email], references: [email])
-  user_email String
+  id           Int      @id @default(autoincrement())
+  access_token String   @unique
+  refresh_toke String   @unique
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+  user         User     @relation(fields: [user_email], references: [email])
+  user_email   String
 }

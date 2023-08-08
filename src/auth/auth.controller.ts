@@ -3,6 +3,7 @@ import { GoogleAuthGuard } from 'auth/utils/guards';
 import { Request, Response } from 'express';
 import { User } from '@prisma/client';
 import { AuthService } from 'auth/auth.service';
+import { AuthGuard } from 'auth/utils/jwtGuard';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +15,6 @@ export class AuthController {
     return { message: 'google auth' };
   }
 
-  // api/auth/google/redirect
   @Get('/google/redirect')
   @UseGuards(GoogleAuthGuard)
   async handleGoogleRedirect(
@@ -31,8 +31,19 @@ export class AuthController {
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
       });
-
-      res.send({ accessToken });
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+      });
     }
+
+    return { status: 'ok' };
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/')
+  async me(@Req() req: Request) {
+    const { email } = req.user as { email: Email };
+
+    return await this.authService.getUserDataFromTokenEmail(email);
   }
 }

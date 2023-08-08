@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'services/prisma.service';
 import { Activity, Prisma, User } from '@prisma/client';
 import { ActivityService } from 'entities/activity/activity.service';
+import { UserDto } from 'entities/user/dto/user.dto';
 
 export interface GetUserDataResponse extends User {
   Activity: Activity[];
@@ -27,7 +28,7 @@ export class UserService {
 
     console.log(`email in service`, email);
 
-    return this.prisma.user.findFirst({
+    return this.prisma.user.findUnique({
       where: { email },
       include: {
         Activity: true,

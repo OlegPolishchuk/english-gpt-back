@@ -1,7 +1,11 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from 'entities/user/user.service';
 import { UserDto } from 'entities/user/dto/user.dto';
 import { BadGatewayException } from 'exeptions/badGateway';
+import { Request } from 'express';
+import { AuthService } from 'auth/auth.service';
+import { AuthGuard } from 'auth/utils/jwtGuard';
+import { User } from '@prisma/client';
 
 @Controller('user')
 export class UserController {
@@ -17,14 +21,14 @@ export class UserController {
     }
   }
 
-  @Get('/:email')
-  async getUserData(@Param() email: Email) {
-    console.log({ email });
-    console.log(typeof email);
+  @UseGuards(AuthGuard)
+  @Get('/')
+  async getUserData(@Req() req: Request) {
     try {
-      const user = await this.userService.getUserData(email);
-      console.log(user);
-      return user;
+      if (req.user) {
+        const { email } = req.user as { email: Email };
+        return await this.userService.getUserData(email);
+      }
     } catch (e) {
       throw new BadGatewayException(e);
     }
