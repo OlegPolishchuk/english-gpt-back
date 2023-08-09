@@ -12,6 +12,7 @@ export class AuthController {
   @Get('google/login')
   @UseGuards(GoogleAuthGuard)
   handleGoogleLogin() {
+    console.log('google/login handler');
     return { message: 'google auth' };
   }
 
@@ -24,16 +25,18 @@ export class AuthController {
     console.log('req.user from controller', req.user);
     if (req.user) {
       const user = req.user as User;
-      const { accessToken, refreshToken } = await this.authService.createNewTokens(
-        user.email,
-      );
+      const tokens = await this.authService.createNewTokens(user.email);
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-      });
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-      });
+      await this.authService.setTokenToCookie(tokens, res);
+
+      // res.cookie('refreshToken', refreshToken, {
+      //   httpOnly: true,
+      //   secure: true,
+      // });
+      // res.cookie('accessToken', accessToken, {
+      //   httpOnly: true,
+      //   secure: true,
+      // });
     }
 
     return { status: 'ok' };
@@ -45,5 +48,25 @@ export class AuthController {
     const { email } = req.user as { email: Email };
 
     return await this.authService.getUserDataFromTokenEmail(email);
+  }
+
+  @Get('/refreshTokens')
+  async refreshTokens(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    console.log(req.headers.cookie);
+    const refreshToken = req.cookies['refreshToken'];
+    console.log('refreshTokens controller', refreshToken);
+    const tokens = await this.authService.refreshTokens(refreshToken);
+
+    console.log('tokens inside controller =>', tokens);
+    await this.authService.setTokenToCookie(tokens, res);
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    // });
+    // res.cookie('accessToken', accessToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    // });
+    return tokens;
   }
 }
